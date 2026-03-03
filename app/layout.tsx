@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from 'next'
-import { Bebas_Neue, Inter } from 'next/font/google'
+import { Rajdhani, Inter } from 'next/font/google'
 import './globals.css'
 
-const bebasNeue = Bebas_Neue({
-  weight: '400',
+const rajdhani = Rajdhani({
+  weight: '700',
   subsets: ['latin'],
   variable: '--font-bebas',
   display: 'swap',
@@ -40,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${bebasNeue.variable} ${inter.variable}`}>
+    <html lang="en" className={`${rajdhani.variable} ${inter.variable}`}>
       <head>
         <link rel="apple-touch-icon" href="/icon-192.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />

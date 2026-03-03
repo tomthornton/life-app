@@ -103,7 +103,7 @@ export default function AppHeader({
         </div>
 
         {/* Tab switcher */}
-        <div className="flex items-center gap-1 pb-0">
+        <div className="flex items-center justify-center gap-1 pb-0">
           {TABS.map((tab) => {
             const isActive = activeTab === tab.id
             return (
@@ -138,9 +138,8 @@ export default function AppHeader({
             )
           })}
 
-          {/* Bottom border */}
-          <div className="flex-1 border-b border-white/5" />
         </div>
+        <div className="border-b border-white/5" />
       </div>
     </div>
   )
