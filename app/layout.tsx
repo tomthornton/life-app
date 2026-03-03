@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Atomic_Age, Inter } from 'next/font/google'
+import { Atomic_Age, Open_Sans } from 'next/font/google'
 import './globals.css'
 
 const atomicAge = Atomic_Age({
@@ -9,7 +9,7 @@ const atomicAge = Atomic_Age({
   display: 'swap',
 })
 
-const inter = Inter({
+const openSans = Open_Sans({
   subsets: ['latin'],
   variable: '--font-inter',
   display: 'swap',
@@ -40,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${atomicAge.variable} ${inter.variable}`}>
+    <html lang="en" className={`${atomicAge.variable} ${openSans.variable}`}>
       <head>
         <link rel="apple-touch-icon" href="/icon-192.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
