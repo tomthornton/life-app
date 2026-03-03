@@ -99,12 +99,7 @@ export default function BottomNav({
               className="relative flex flex-col items-center gap-1.5 px-5 py-2.5 rounded-2xl transition-all duration-300"
               style={isActive ? { background: `${activeColor}15` } : {}}
             >
-              {isActive && (
-                <span
-                  className="absolute top-1.5 w-1 h-1 rounded-full"
-                  style={{ background: activeColor, boxShadow: `0 0 6px ${activeColor}` }}
-                />
-              )}
+
               {renderIcon(isActive, activeColor, glowColor)}
               <span
                 className="text-[10px] font-semibold tracking-wide transition-all duration-300"
