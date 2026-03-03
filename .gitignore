@@ -1,0 +1,7 @@
+.next/
+node_modules/
+.env.local
+.env
+out/
+public/sw.js
+public/workbox-*.js
