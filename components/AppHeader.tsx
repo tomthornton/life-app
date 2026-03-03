@@ -4,6 +4,7 @@ import { User } from 'lucide-react'
 import { Tab } from '@/app/page'
 import CrossIcon from '@/components/icons/CrossIcon'
 import { Brain, Dumbbell, House } from 'lucide-react'
+import MBSWordmark from '@/components/MBSWordmark'
 
 const TABS: { id: Tab; label: string; color: string }[] = [
   { id: 'home',   label: 'Home',   color: '#e2e8f0' },
@@ -62,19 +63,7 @@ export default function AppHeader({
       <div className="relative px-5 pt-6 pb-0">
         {/* Top row */}
         <div className="flex items-center justify-between mb-4">
-          {/* MBS Wordmark — Bebas Neue, white, no gradient */}
-          <span
-            className="text-white select-none"
-            style={{
-              fontFamily: 'var(--font-bebas)',
-              fontSize: '3rem',
-              lineHeight: 1,
-              letterSpacing: '0.04em',
-              textShadow: `0 0 30px ${color}60`,
-            }}
-          >
-            MBS
-          </span>
+          <MBSWordmark />
 
           {/* Right: greeting + profile */}
           <div className="flex items-center gap-3">
