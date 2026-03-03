@@ -71,7 +71,7 @@ export default function AppHeader({
               <p className="text-[10px] text-white/30 font-medium leading-none">
                 {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
               </p>
-              <p className="text-sm font-semibold text-white mt-1">
+              <p className="text-white mt-1" style={{ fontFamily: "'Atomic Age', cursive", fontSize: '0.95rem' }}>
                 {greeting()}, {userName.split(' ')[0]}
               </p>
             </div>
