@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import HomeTab from '@/components/tabs/HomeTab'
 import MindTab from '@/components/tabs/MindTab'
 import BodyTab from '@/components/tabs/BodyTab'
 import SpiritTab from '@/components/tabs/SpiritTab'
@@ -8,10 +9,10 @@ import ProfileTab from '@/components/tabs/ProfileTab'
 import BottomNav from '@/components/BottomNav'
 import AppHeader from '@/components/AppHeader'
 
-export type Tab = 'mind' | 'body' | 'spirit' | 'profile'
+export type Tab = 'home' | 'mind' | 'body' | 'spirit' | 'profile'
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<Tab>('mind')
+  const [activeTab, setActiveTab] = useState<Tab>('home')
   const [userName, setUserName] = useState('Thomas')
 
   useEffect(() => {
@@ -21,9 +22,14 @@ export default function Home() {
 
   return (
     <main className="fixed inset-0 flex flex-col bg-[#0a0a10] overflow-hidden">
-      <AppHeader activeTab={activeTab} userName={userName} />
+      <AppHeader
+        activeTab={activeTab}
+        userName={userName}
+        onProfilePress={() => setActiveTab('profile')}
+      />
 
       <div className="flex-1 overflow-y-auto no-scrollbar">
+        {activeTab === 'home'    && <HomeTab setActiveTab={setActiveTab} />}
         {activeTab === 'mind'    && <MindTab />}
         {activeTab === 'body'    && <BodyTab />}
         {activeTab === 'spirit'  && <SpiritTab />}
