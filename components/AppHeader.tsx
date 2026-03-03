@@ -63,7 +63,7 @@ export default function AppHeader({
       <div className="relative px-5 pt-6 pb-0">
         {/* Top row */}
         <div className="flex items-center justify-between mb-4">
-          <MBSWordmark />
+          <MBSWordmark glowColor={color} />
 
           {/* Right: greeting + profile */}
           <div className="flex items-center gap-3">
