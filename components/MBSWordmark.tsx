@@ -3,10 +3,10 @@ export default function MBSWordmark({ glowColor }: { glowColor?: string }) {
     <span
       className="text-white select-none"
       style={{
-        fontFamily: 'var(--font-bebas)',
-        fontSize: '3rem',
+        fontFamily: "'Atomic Age', var(--font-bebas), cursive",
+        fontSize: '2.6rem',
         lineHeight: 1,
-        letterSpacing: '0.08em',
+        letterSpacing: '0.05em',
         textShadow: glowColor ? `0 0 30px ${glowColor}50` : undefined,
       }}
     >
