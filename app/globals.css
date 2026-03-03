@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --font-inter: 'Inter', system-ui, sans-serif;
+  --font-inter: var(--font-inter-var, 'Inter', system-ui, sans-serif);
+  --font-bebas: var(--font-bebas-var, 'Bebas Neue', system-ui, sans-serif);
 }
 
 * {

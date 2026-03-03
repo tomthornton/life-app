@@ -26,6 +26,7 @@ export default function Home() {
         activeTab={activeTab}
         userName={userName}
         onProfilePress={() => setActiveTab('profile')}
+        onTabPress={setActiveTab}
       />
 
       <div className="flex-1 overflow-y-auto no-scrollbar">
