@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import CrossIcon from '@/components/icons/CrossIcon'
+import SubTabBar from '@/components/SubTabBar'
 
 type SpiritMode = 'daily' | 'gratitude' | 'prayer' | 'chat'
 
@@ -29,10 +30,10 @@ const DAILY_CONTENT = {
 }
 
 const MODES = [
-  { id: 'daily' as SpiritMode,    label: '📖 Daily' },
-  { id: 'gratitude' as SpiritMode, label: '🙏 Gratitude' },
-  { id: 'prayer' as SpiritMode,   label: '✝️ Prayer' },
-  { id: 'chat' as SpiritMode,     label: '💬 Reflect' },
+  { id: 'daily'     as SpiritMode, label: 'Daily',     icon: '📖' },
+  { id: 'gratitude' as SpiritMode, label: 'Gratitude', icon: '🙏' },
+  { id: 'prayer'    as SpiritMode, label: 'Prayer',    icon: '✝️' },
+  { id: 'chat'      as SpiritMode, label: 'Reflect',   icon: '💬' },
 ]
 
 function Chevron({ open }: { open: boolean }) {
@@ -106,17 +107,7 @@ export default function SpiritTab() {
 
   return (
     <div className="flex flex-col">
-      {/* Mode selector */}
-      <div className="flex border-b border-border">
-        {MODES.map(m => (
-          <button key={m.id} onClick={() => setMode(m.id)}
-            className="flex-1 py-3 text-[11px] font-bold tracking-wide uppercase transition-all relative"
-            style={{ color: mode === m.id ? '#f59e0b' : 'rgba(255,255,255,0.25)' }}>
-            {mode === m.id && <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full" style={{ background: '#f59e0b', boxShadow: '0 0 8px #f59e0b' }} />}
-            {m.label}
-          </button>
-        ))}
-      </div>
+      <SubTabBar tabs={MODES} active={mode} onChange={(id) => setMode(id as SpiritMode)} color="#f59e0b" />
 
       {/* ── DAILY ── */}
       {mode === 'daily' && (

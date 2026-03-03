@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Dumbbell, Droplets, Trophy, Lightbulb } from 'lucide-react'
+import SubTabBar from '@/components/SubTabBar'
 
 type BodyMode = 'workout' | 'health' | 'hydration' | 'records'
 
@@ -82,10 +83,10 @@ const TODAY_KEY = new Date().toISOString().split('T')[0]
 const DAILY_GOAL = 8 // glasses
 
 const MODES = [
-  { id: 'workout' as BodyMode, label: 'Workout', Icon: Dumbbell },
-  { id: 'health'  as BodyMode, label: 'Health',  Icon: Lightbulb },
-  { id: 'hydration' as BodyMode, label: 'Hydration', Icon: Droplets },
-  { id: 'records' as BodyMode, label: 'PRs', Icon: Trophy },
+  { id: 'workout'   as BodyMode, label: 'Workout',    icon: '🏋️' },
+  { id: 'health'    as BodyMode, label: 'Health',     icon: '💡' },
+  { id: 'hydration' as BodyMode, label: 'Hydration',  icon: '💧' },
+  { id: 'records'   as BodyMode, label: 'PRs',        icon: '🏆' },
 ]
 
 export default function BodyTab() {
@@ -122,18 +123,7 @@ export default function BodyTab() {
 
   return (
     <div className="flex flex-col">
-      {/* Mode selector */}
-      <div className="flex border-b border-border">
-        {MODES.map(({ id, label, Icon }) => (
-          <button key={id} onClick={() => setMode(id)}
-            className="flex-1 flex flex-col items-center gap-1 py-3 transition-all relative"
-            style={{ color: mode === id ? '#22c55e' : 'rgba(255,255,255,0.25)' }}>
-            {mode === id && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-body rounded-full" style={{ boxShadow: '0 0 8px #22c55e' }} />}
-            <Icon size={16} strokeWidth={mode === id ? 2 : 1.5} />
-            <span className="text-[10px] font-bold tracking-widest uppercase">{label}</span>
-          </button>
-        ))}
-      </div>
+      <SubTabBar tabs={MODES} active={mode} onChange={(id) => setMode(id as BodyMode)} color="#22c55e" />
 
       {/* ── WORKOUT ── */}
       {mode === 'workout' && (

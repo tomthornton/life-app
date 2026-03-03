@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import SubTabBar from '@/components/SubTabBar'
 
 type ChatMode = 'chat' | 'therapy' | 'journal' | 'mood'
 
@@ -86,28 +87,16 @@ export default function MindTab() {
     setMoodNote('')
   }
 
-  const MODES: { id: ChatMode; label: string }[] = [
-    { id: 'chat', label: '💬 Chat' },
-    { id: 'therapy', label: '🛋️ Therapy' },
-    { id: 'journal', label: '📓 Journal' },
-    { id: 'mood', label: '🌡️ Mood' },
+  const MODES = [
+    { id: 'chat',    label: 'Chat',    icon: '💬' },
+    { id: 'therapy', label: 'Therapy', icon: '🛋️' },
+    { id: 'journal', label: 'Journal', icon: '📓' },
+    { id: 'mood',    label: 'Mood',    icon: '🌡️' },
   ]
 
   return (
     <div className="flex flex-col h-full">
-      {/* Mode selector */}
-      <div className="flex gap-2 px-4 py-3 border-b border-border overflow-x-auto no-scrollbar">
-        {MODES.map(m => (
-          <button key={m.id} onClick={() => setMode(m.id)}
-            className="flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all"
-            style={mode === m.id
-              ? { background: '#6366f1', color: '#fff' }
-              : { background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.45)' }
-            }>
-            {m.label}
-          </button>
-        ))}
-      </div>
+      <SubTabBar tabs={MODES} active={mode} onChange={(id) => setMode(id as ChatMode)} color="#6366f1" />
 
       {/* ── CHAT / THERAPY ── */}
       {(mode === 'chat' || mode === 'therapy') && (
