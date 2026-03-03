@@ -25,9 +25,11 @@ const SETTINGS_SECTIONS = [
 export default function ProfileTab({
   userName,
   setUserName,
+  onLogout,
 }: {
   userName: string
   setUserName: (name: string) => void
+  onLogout?: () => void
 }) {
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(userName)
@@ -105,6 +107,16 @@ export default function ProfileTab({
           </div>
         </div>
       ))}
+
+      {/* Logout */}
+      {onLogout && (
+        <button
+          onClick={onLogout}
+          className="w-full py-3.5 rounded-2xl border border-red-500/20 bg-red-500/5 text-red-400 text-sm font-semibold transition-all active:scale-[0.98]"
+        >
+          Log Out
+        </button>
+      )}
 
       {/* MBS branding */}
       <div className="flex flex-col items-center gap-3 py-6">
