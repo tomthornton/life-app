@@ -92,14 +92,14 @@ export default function AppHeader({
         </div>
 
         {/* Tab switcher */}
-        <div className="flex items-center justify-center gap-1 pb-0">
+        <div className="flex items-center pb-0">
           {TABS.map((tab) => {
             const isActive = activeTab === tab.id
             return (
               <button
                 key={tab.id}
                 onClick={() => onTabPress(tab.id)}
-                className="flex items-center gap-1.5 px-3 py-2.5 transition-all duration-300 relative"
+                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 transition-all duration-300 relative"
               >
                 {/* Active underline */}
                 <span
