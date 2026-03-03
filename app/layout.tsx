@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from 'next'
-import { Orbitron, Inter } from 'next/font/google'
+import { Atomic_Age, Inter } from 'next/font/google'
 import './globals.css'
 
-const orbitron = Orbitron({
-  weight: '800',
+const atomicAge = Atomic_Age({
+  weight: '400',
   subsets: ['latin'],
   variable: '--font-bebas',
   display: 'swap',
@@ -40,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${orbitron.variable} ${inter.variable}`}>
+    <html lang="en" className={`${atomicAge.variable} ${inter.variable}`}>
       <head>
         <link rel="apple-touch-icon" href="/icon-192.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
