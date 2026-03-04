@@ -9,33 +9,9 @@ import ProfileTab from '@/components/tabs/ProfileTab'
 import BottomNav from '@/components/BottomNav'
 import AppHeader from '@/components/AppHeader'
 import AuthScreen from '@/components/AuthScreen'
-
-export type Tab = 'home' | 'mind' | 'body' | 'spirit' | 'profile'
+import { Tab, SUB_TABS } from '@/lib/tabs'
 
 type User = { name: string; email: string }
-
-export const SUB_TABS: Record<Tab, { id: string; label: string; icon: string }[]> = {
-  home:    [],
-  profile: [],
-  mind:    [
-    { id: 'chat',    label: 'Chat',    icon: '💬' },
-    { id: 'therapy', label: 'Therapy', icon: '🛋️' },
-    { id: 'journal', label: 'Journal', icon: '📓' },
-    { id: 'mood',    label: 'Mood',    icon: '🌡️' },
-  ],
-  body:    [
-    { id: 'workout',   label: 'Workout',   icon: '🏋️' },
-    { id: 'health',    label: 'Health',    icon: '💡' },
-    { id: 'hydration', label: 'Hydration', icon: '💧' },
-    { id: 'records',   label: 'PRs',       icon: '🏆' },
-  ],
-  spirit:  [
-    { id: 'daily',     label: 'Daily',     icon: '📖' },
-    { id: 'gratitude', label: 'Gratitude', icon: '🙏' },
-    { id: 'prayer',    label: 'Prayer',    icon: '✝️' },
-    { id: 'chat',      label: 'Reflect',   icon: '💬' },
-  ],
-}
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>('home')

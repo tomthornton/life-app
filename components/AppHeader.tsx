@@ -1,7 +1,7 @@
 'use client'
 
 import { User } from 'lucide-react'
-import { Tab, SUB_TABS } from '@/app/page'
+import { Tab, SUB_TABS } from '@/lib/tabs'
 import CrossIcon from '@/components/icons/CrossIcon'
 import { Brain, Dumbbell, House } from 'lucide-react'
 import MBSWordmark from '@/components/MBSWordmark'

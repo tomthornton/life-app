@@ -1,6 +1,6 @@
 'use client'
 
-import { Tab } from '@/app/page'
+import { Tab } from '@/lib/tabs'
 import CrossIcon from '@/components/icons/CrossIcon'
 import { Brain, Dumbbell, ChevronRight } from 'lucide-react'
 

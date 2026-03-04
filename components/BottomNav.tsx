@@ -1,7 +1,7 @@
 'use client'
 
 import { Brain, Dumbbell, House } from 'lucide-react'
-import { Tab } from '@/app/page'
+import { Tab } from '@/lib/tabs'
 import CrossIcon from '@/components/icons/CrossIcon'
 
 const tabs: {
