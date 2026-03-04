@@ -32,19 +32,14 @@ export default function AppHeader({
       <div className="relative px-5 pt-5 pb-4 flex items-center justify-between">
         <MBSWordmark glowColor={color} />
 
-        <div className="flex items-center gap-3">
-          <p className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.3)' }}>
-            {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
-          </p>
-          <button onClick={onProfilePress}
-            className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200"
-            style={{
-              background: activeTab === 'profile' ? `${color}20` : 'rgba(255,255,255,0.07)',
-              border: `1px solid ${activeTab === 'profile' ? `${color}50` : 'rgba(255,255,255,0.08)'}`,
-            }}>
-            <User size={16} style={{ color: activeTab === 'profile' ? color : 'rgba(255,255,255,0.5)' }} />
-          </button>
-        </div>
+        <button onClick={onProfilePress}
+          className="w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-200"
+          style={{
+            background: activeTab === 'profile' ? `${color}20` : 'rgba(255,255,255,0.07)',
+            border: `1px solid ${activeTab === 'profile' ? `${color}50` : 'rgba(255,255,255,0.08)'}`,
+          }}>
+          <User size={20} style={{ color: activeTab === 'profile' ? color : 'rgba(255,255,255,0.5)' }} />
+        </button>
       </div>
 
       {/* Bottom border shimmer */}
