@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import TabPageHeader from '@/components/TabPageHeader'
 
 
 type ChatMode = 'chat' | 'therapy' | 'journal' | 'mood'
@@ -29,7 +30,7 @@ function useLocalStorage<T>(key: string, initial: T) {
   return [val, set] as const
 }
 
-export default function MindTab({ mode: modeProp }: { mode?: string }) {
+export default function MindTab({ mode: modeProp, onModeChange }: { mode?: string; onModeChange?: (m: string) => void }) {
   const mode = (modeProp ?? 'chat') as ChatMode
 
   // Chat
@@ -89,6 +90,7 @@ export default function MindTab({ mode: modeProp }: { mode?: string }) {
 
   return (
     <div className="flex flex-col h-full">
+      <TabPageHeader tab="mind" subTab={mode} onSubTabChange={onModeChange} />
 
       {/* ── CHAT / THERAPY ── */}
       {(mode === 'chat' || mode === 'therapy') && (

@@ -30,11 +30,27 @@ const WORKOUT_WEEK_TOTAL = 5
 
 const QUOTE = QUOTES[new Date().getDate() % QUOTES.length]
 
-export default function HomeTab({ setActiveTab }: { setActiveTab: (t: Tab) => void }) {
+function greeting() {
+  const h = new Date().getHours()
+  if (h < 12) return 'Good morning'
+  if (h < 17) return 'Good afternoon'
+  return 'Good evening'
+}
+
+export default function HomeTab({ setActiveTab, userName }: { setActiveTab: (t: Tab) => void; userName?: string }) {
   const isRestDay = WORKOUT_TODAY === 'Rest'
 
   return (
     <div className="px-4 py-5 space-y-4">
+      {/* Greeting */}
+      <div className="pb-1">
+        <p className="text-white/40 text-xs uppercase tracking-widest font-medium">
+          {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+        </p>
+        <p className="text-white text-2xl font-bold mt-1">
+          {greeting()}, {userName?.split(' ')[0] ?? 'Thomas'} 👋
+        </p>
+      </div>
 
       {/* Daily verse — Spirit */}
       <div

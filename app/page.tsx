@@ -39,18 +39,14 @@ export default function Home() {
     <main className="fixed inset-0 flex flex-col bg-[#0a0a10] overflow-hidden">
       <AppHeader
         activeTab={activeTab}
-        subTab={subTab}
-        onSubTabChange={setSubTab}
-        userName={user.name}
         onProfilePress={() => handleTabChange('profile')}
-        onTabPress={handleTabChange}
       />
 
       <div className="flex-1 overflow-y-auto no-scrollbar">
-        {activeTab === 'home'    && <HomeTab setActiveTab={handleTabChange} />}
-        {activeTab === 'mind'    && <MindTab mode={subTab} />}
-        {activeTab === 'body'    && <BodyTab mode={subTab} />}
-        {activeTab === 'spirit'  && <SpiritTab mode={subTab} />}
+        {activeTab === 'home'    && <HomeTab setActiveTab={handleTabChange} userName={user.name} />}
+        {activeTab === 'mind'    && <MindTab mode={subTab} onModeChange={setSubTab} />}
+        {activeTab === 'body'    && <BodyTab mode={subTab} onModeChange={setSubTab} />}
+        {activeTab === 'spirit'  && <SpiritTab mode={subTab} onModeChange={setSubTab} />}
         {activeTab === 'profile' && (
           <ProfileTab
             userName={user.name}

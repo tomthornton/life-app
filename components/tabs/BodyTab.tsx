@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Dumbbell, Droplets, Trophy, Lightbulb } from 'lucide-react'
+import TabPageHeader from '@/components/TabPageHeader'
 
 
 type BodyMode = 'workout' | 'health' | 'hydration' | 'records'
@@ -89,7 +90,7 @@ const MODES = [
   { id: 'records'   as BodyMode, label: 'PRs',        icon: '🏆' },
 ]
 
-export default function BodyTab({ mode: modeProp }: { mode?: string }) {
+export default function BodyTab({ mode: modeProp, onModeChange }: { mode?: string; onModeChange?: (m: string) => void }) {
   const mode = (modeProp ?? 'workout') as BodyMode
   const [week, setWeek] = useState(WORKOUT_WEEK)
   const [selectedDay, setSelectedDay] = useState(TODAY)
@@ -123,6 +124,7 @@ export default function BodyTab({ mode: modeProp }: { mode?: string }) {
 
   return (
     <div className="flex flex-col">
+      <TabPageHeader tab="body" subTab={mode} onSubTabChange={onModeChange} />
 
       {/* ── WORKOUT ── */}
       {mode === 'workout' && (

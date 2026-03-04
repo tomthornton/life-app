@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import CrossIcon from '@/components/icons/CrossIcon'
+import TabPageHeader from '@/components/TabPageHeader'
 
 
 type SpiritMode = 'daily' | 'gratitude' | 'prayer' | 'chat'
@@ -45,7 +46,7 @@ function Chevron({ open }: { open: boolean }) {
   )
 }
 
-export default function SpiritTab({ mode: modeProp }: { mode?: string }) {
+export default function SpiritTab({ mode: modeProp, onModeChange }: { mode?: string; onModeChange?: (m: string) => void }) {
   const mode = (modeProp ?? 'daily') as SpiritMode
   const [expanded, setExpanded] = useState<string | null>('verse')
 
@@ -107,6 +108,7 @@ export default function SpiritTab({ mode: modeProp }: { mode?: string }) {
 
   return (
     <div className="flex flex-col">
+      <TabPageHeader tab="spirit" subTab={mode} onSubTabChange={onModeChange} />
 
       {/* ── DAILY ── */}
       {mode === 'daily' && (
