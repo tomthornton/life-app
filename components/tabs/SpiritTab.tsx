@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import CrossIcon from '@/components/icons/CrossIcon'
-import SubTabBar from '@/components/SubTabBar'
+
 
 type SpiritMode = 'daily' | 'gratitude' | 'prayer' | 'chat'
 
@@ -45,8 +45,8 @@ function Chevron({ open }: { open: boolean }) {
   )
 }
 
-export default function SpiritTab() {
-  const [mode, setMode] = useState<SpiritMode>('daily')
+export default function SpiritTab({ mode: modeProp }: { mode?: string }) {
+  const mode = (modeProp ?? 'daily') as SpiritMode
   const [expanded, setExpanded] = useState<string | null>('verse')
 
   // Gratitude
@@ -107,7 +107,6 @@ export default function SpiritTab() {
 
   return (
     <div className="flex flex-col">
-      <SubTabBar tabs={MODES} active={mode} onChange={(id) => setMode(id as SpiritMode)} color="#f59e0b" />
 
       {/* ── DAILY ── */}
       {mode === 'daily' && (

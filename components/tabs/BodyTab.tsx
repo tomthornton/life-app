@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Dumbbell, Droplets, Trophy, Lightbulb } from 'lucide-react'
-import SubTabBar from '@/components/SubTabBar'
+
 
 type BodyMode = 'workout' | 'health' | 'hydration' | 'records'
 
@@ -89,8 +89,8 @@ const MODES = [
   { id: 'records'   as BodyMode, label: 'PRs',        icon: '🏆' },
 ]
 
-export default function BodyTab() {
-  const [mode, setMode] = useState<BodyMode>('workout')
+export default function BodyTab({ mode: modeProp }: { mode?: string }) {
+  const mode = (modeProp ?? 'workout') as BodyMode
   const [week, setWeek] = useState(WORKOUT_WEEK)
   const [selectedDay, setSelectedDay] = useState(TODAY)
   const [hydration, setHydration] = useLocalStorage<Record<string,number>>('mbs_hydration', {})
@@ -123,7 +123,6 @@ export default function BodyTab() {
 
   return (
     <div className="flex flex-col">
-      <SubTabBar tabs={MODES} active={mode} onChange={(id) => setMode(id as BodyMode)} color="#22c55e" />
 
       {/* ── WORKOUT ── */}
       {mode === 'workout' && (

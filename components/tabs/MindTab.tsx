@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import SubTabBar from '@/components/SubTabBar'
+
 
 type ChatMode = 'chat' | 'therapy' | 'journal' | 'mood'
 
@@ -29,8 +29,8 @@ function useLocalStorage<T>(key: string, initial: T) {
   return [val, set] as const
 }
 
-export default function MindTab() {
-  const [mode, setMode] = useState<ChatMode>('chat')
+export default function MindTab({ mode: modeProp }: { mode?: string }) {
+  const mode = (modeProp ?? 'chat') as ChatMode
 
   // Chat
   const [messages, setMessages] = useState<Message[]>([
@@ -87,16 +87,8 @@ export default function MindTab() {
     setMoodNote('')
   }
 
-  const MODES = [
-    { id: 'chat',    label: 'Chat',    icon: '💬' },
-    { id: 'therapy', label: 'Therapy', icon: '🛋️' },
-    { id: 'journal', label: 'Journal', icon: '📓' },
-    { id: 'mood',    label: 'Mood',    icon: '🌡️' },
-  ]
-
   return (
     <div className="flex flex-col h-full">
-      <SubTabBar tabs={MODES} active={mode} onChange={(id) => setMode(id as ChatMode)} color="#6366f1" />
 
       {/* ── CHAT / THERAPY ── */}
       {(mode === 'chat' || mode === 'therapy') && (
