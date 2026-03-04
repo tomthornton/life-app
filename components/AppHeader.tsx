@@ -18,8 +18,6 @@ const TAB_LABELS: Record<Tab, string> = {
   home: 'Home', mind: 'Mind', body: 'Body', spirit: 'Spirit', profile: 'Profile',
 }
 
-const MAIN_TABS: Tab[] = ['home', 'mind', 'body', 'spirit']
-
 function TabIcon({ id, size = 11 }: { id: Tab; size?: number }) {
   if (id === 'spirit') return <CrossIcon size={size} color="currentColor" />
   if (id === 'mind')   return <Brain size={size} strokeWidth={2.5} />
@@ -84,32 +82,21 @@ export default function AppHeader({
           </div>
         </div>
 
-        {/* Bottom row: tab title + sub-tabs (or greeting) */}
-        <div className="flex items-center gap-0">
-          {/* Main tab switcher */}
-          <div className="flex items-center">
-            {MAIN_TABS.map((tab) => {
-              const isActive = activeTab === tab
-              return (
-                <button key={tab} onClick={() => onTabPress(tab)}
-                  className="flex items-center justify-center gap-1.5 px-3 py-2.5 transition-all duration-300 relative"
-                  style={{ color: isActive ? TAB_COLORS[tab] : 'rgba(255,255,255,0.22)' }}>
-                  {isActive && (
-                    <span className="absolute bottom-0 left-2 right-2 h-0.5 rounded-full transition-all duration-300"
-                      style={{ background: color, boxShadow: `0 0 8px ${color}` }} />
-                  )}
-                  <TabIcon id={tab} size={11} />
-                  <span className="text-[11px] font-bold tracking-widest uppercase">{TAB_LABELS[tab]}</span>
-                </button>
-              )
-            })}
+        {/* Bottom row: current tab name + sub-tabs (or greeting for home) */}
+        <div className="flex items-center gap-2">
+          {/* Tab label */}
+          <div className="flex items-center gap-1.5 flex-shrink-0 py-2.5">
+            <TabIcon id={activeTab} size={11} />
+            <span className="text-[11px] font-bold tracking-widest uppercase" style={{ color }}>
+              {TAB_LABELS[activeTab]}
+            </span>
           </div>
 
           {/* Divider */}
-          <div className="w-px h-5 mx-1 flex-shrink-0" style={{ background: 'rgba(255,255,255,0.08)' }} />
+          <div className="w-px h-4 flex-shrink-0" style={{ background: 'rgba(255,255,255,0.1)' }} />
 
-          {/* Right side: sub-tabs or greeting */}
-          <div className="flex-1 flex items-center overflow-x-auto no-scrollbar gap-1 pl-1">
+          {/* Sub-tabs or greeting */}
+          <div className="flex-1 flex items-center overflow-x-auto no-scrollbar gap-1">
             {subTabs.length > 0 ? (
               subTabs.map((st) => {
                 const isActive = subTab === st.id
@@ -125,13 +112,11 @@ export default function AppHeader({
                   </button>
                 )
               })
-            ) : (
-              activeTab !== 'profile' && (
-                <p className="text-[11px] font-medium tracking-wide pl-1" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                  {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-                </p>
-              )
-            )}
+            ) : activeTab === 'home' ? (
+              <p className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+              </p>
+            ) : null}
           </div>
         </div>
 
