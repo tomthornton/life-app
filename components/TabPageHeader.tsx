@@ -59,8 +59,7 @@ export default function TabPageHeader({
                 ? { background: `${color}20`, color, border: `1px solid ${color}35` }
                 : { color: 'rgba(255,255,255,0.25)', border: '1px solid transparent' }
               }>
-              <span style={{ fontSize: '12px' }}>{st.icon}</span>
-              <span>{st.label}</span>
+              {st.label}
             </button>
           )
         })}
