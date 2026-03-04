@@ -220,28 +220,68 @@ export default function MindTab({ mode: modeProp, onModeChange }: { mode?: strin
             </div>
           )}
 
-          {/* Mood history */}
-          {moods.length > 0 && (
-            <div>
-              <p className="text-[10px] text-white/30 uppercase tracking-widest font-semibold px-1 mb-2">Recent</p>
-              <div className="bg-card border border-border rounded-2xl overflow-hidden">
-                {[...moods].reverse().slice(0, 7).map((m, i, arr) => (
-                  <div key={m.date} className={`flex items-center gap-3 px-4 py-3 ${i < arr.length - 1 ? 'border-b border-border' : ''}`}>
-                    <span className="text-xl">{MOODS.find(x => x.score === m.score)?.emoji}</span>
-                    <div className="flex-1">
-                      <p className="text-xs text-white/50">{m.date}</p>
-                      {m.note && <p className="text-xs text-white/30 italic mt-0.5">"{m.note}"</p>}
-                    </div>
-                    <div className="flex gap-0.5">
-                      {[1,2,3,4,5].map(s => (
-                        <div key={s} className="w-1.5 h-1.5 rounded-full" style={{ background: s <= m.score ? '#6366f1' : 'rgba(255,255,255,0.1)' }} />
-                      ))}
-                    </div>
+          {/* Mood chart */}
+          {moods.length > 1 && (() => {
+            const sorted = [...moods].sort((a, b) => a.date.localeCompare(b.date)).slice(-14)
+            const avg = (sorted.reduce((s, m) => s + m.score, 0) / sorted.length).toFixed(1)
+            const trend = sorted.length > 1 ? sorted[sorted.length-1].score - sorted[0].score : 0
+            return (
+              <div className="bg-card border border-border rounded-2xl p-4">
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-[10px] text-white/30 uppercase tracking-widest font-semibold">Mood Trend</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-white/40">Avg <span className="text-white font-bold">{avg}</span>/5</span>
+                    <span className="text-xs font-bold" style={{ color: trend > 0 ? '#22c55e' : trend < 0 ? '#f87171' : 'rgba(255,255,255,0.3)' }}>
+                      {trend > 0 ? '↑' : trend < 0 ? '↓' : '→'}
+                    </span>
                   </div>
-                ))}
+                </div>
+
+                {/* Chart */}
+                <div className="relative mt-3" style={{ height: 100 }}>
+                  <svg width="100%" height="100" viewBox="0 0 300 100" preserveAspectRatio="none">
+                    {/* Grid */}
+                    {[1,2,3,4,5].map(s => (
+                      <line key={s} x1="0" y1={100 - (s/5)*85} x2="300" y2={100 - (s/5)*85}
+                        stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+                    ))}
+                    {/* Area */}
+                    <path
+                      d={`M ${sorted.map((m, i) => `${(i/(sorted.length-1))*300},${100 - (m.score/5)*85}`).join(' L ')} L 300,100 L 0,100 Z`}
+                      fill="url(#mindGrad)" opacity="0.25" />
+                    {/* Line */}
+                    <path
+                      d={`M ${sorted.map((m, i) => `${(i/(sorted.length-1))*300},${100 - (m.score/5)*85}`).join(' L ')}`}
+                      fill="none" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                      style={{ filter: 'drop-shadow(0 0 4px rgba(99,102,241,0.7))' }} />
+                    {/* Dots */}
+                    {sorted.map((m, i) => (
+                      <circle key={i}
+                        cx={(i/(sorted.length-1))*300} cy={100 - (m.score/5)*85}
+                        r="4" fill="#6366f1" stroke="#0a0a10" strokeWidth="2"
+                        style={{ filter: 'drop-shadow(0 0 3px rgba(99,102,241,0.9))' }} />
+                    ))}
+                    <defs>
+                      <linearGradient id="mindGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#6366f1" />
+                        <stop offset="100%" stopColor="transparent" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  {/* Y labels */}
+                  <div className="absolute right-0 top-0 flex flex-col justify-between h-full text-[9px] text-white/20 pointer-events-none" style={{ height: 85 }}>
+                    <span>😁</span><span>🙂</span><span>😐</span><span>😕</span><span>😞</span>
+                  </div>
+                </div>
+
+                {/* X labels */}
+                <div className="flex justify-between mt-1">
+                  <span className="text-[9px] text-white/20">{sorted[0]?.date}</span>
+                  <span className="text-[9px] text-white/20">{sorted[sorted.length-1]?.date}</span>
+                </div>
               </div>
-            </div>
-          )}
+            )
+          })()}
         </div>
       )}
     </div>

@@ -1,15 +1,17 @@
 'use client'
 
 import { useState } from 'react'
-import { Dumbbell, Droplets, Trophy, Lightbulb } from 'lucide-react'
 import TabPageHeader from '@/components/TabPageHeader'
 
+type BodyMode = 'today' | 'train' | 'nutrition' | 'progress'
 
-type BodyMode = 'workout' | 'health' | 'hydration' | 'records'
-
-type Exercise = { name: string; sets: number; reps: string; done: boolean }
-type WorkoutDay = { day: string; focus: string; shortFocus: string; color: string; exercises: Exercise[] }
-type PR = { exercise: string; value: string; date: string }
+type WorkoutDay = {
+  day: string
+  focus: string
+  shortFocus: string
+  type: 'push' | 'pull' | 'legs' | 'rest' | 'cardio'
+  exercises: { name: string; sets: number; reps: string; done: boolean }[]
+}
 
 function useLocalStorage<T>(key: string, initial: T) {
   const [val, setVal] = useState<T>(() => {
@@ -20,93 +22,79 @@ function useLocalStorage<T>(key: string, initial: T) {
   return [val, set] as const
 }
 
-const HEALTH_TIPS = [
-  { title: "Prioritize Protein", body: "Aim for 0.7–1g of protein per pound of bodyweight. It's the single biggest lever for body composition. Most people are chronically under.", icon: "🥩" },
-  { title: "Walk More", body: "10,000 steps isn't magic — but walking 30–60 min daily dramatically improves insulin sensitivity, mood, and cardiovascular health with zero recovery cost.", icon: "🚶" },
-  { title: "Sleep is a Performance Drug", body: "7–9 hours isn't optional. Sleep debt tanks testosterone, raises cortisol, kills recovery, and wrecks decision-making. Protect it aggressively.", icon: "😴" },
-  { title: "Sunlight in the Morning", body: "Get outside within an hour of waking. Morning light sets your circadian rhythm, boosts mood, and improves sleep quality that night.", icon: "☀️" },
-  { title: "Cold Water Works", body: "Cold showers or cold plunges after training can reduce soreness and inflammation. Even 30 seconds cold at the end of a shower has a real effect.", icon: "🧊" },
-  { title: "Stress = Stored Fat", body: "Chronic elevated cortisol signals your body to store fat, especially visceral. Manage stress as seriously as you manage diet and training.", icon: "🧘" },
-  { title: "Don't Skip Warm-Ups", body: "5–10 minutes of movement prep before training reduces injury risk dramatically and improves performance. Your heaviest set should never be your first.", icon: "🔥" },
-]
-
-const TODAY_TIP = HEALTH_TIPS[new Date().getDate() % HEALTH_TIPS.length]
+const TODAY_KEY = new Date().toISOString().split('T')[0]
+const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+const TODAY_NAME = DAYS[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1]
 
 const WORKOUT_WEEK: WorkoutDay[] = [
-  { day: 'Monday', focus: 'Push — Chest / Shoulders / Triceps', shortFocus: 'Push Day', color: 'text-red-400', exercises: [
+  { day: 'Monday', focus: 'Chest · Shoulders · Triceps', shortFocus: 'Push', type: 'push', exercises: [
     { name: 'Bench Press', sets: 4, reps: '8-10', done: false },
     { name: 'Overhead Press', sets: 3, reps: '10', done: false },
     { name: 'Incline Dumbbell Press', sets: 3, reps: '10-12', done: false },
     { name: 'Lateral Raises', sets: 3, reps: '15', done: false },
     { name: 'Tricep Pushdowns', sets: 3, reps: '12-15', done: false },
   ]},
-  { day: 'Tuesday', focus: 'Pull — Back / Biceps', shortFocus: 'Pull Day', color: 'text-blue-400', exercises: [
+  { day: 'Tuesday', focus: 'Back · Biceps', shortFocus: 'Pull', type: 'pull', exercises: [
     { name: 'Pull-Ups', sets: 4, reps: '6-10', done: false },
     { name: 'Barbell Row', sets: 4, reps: '8', done: false },
     { name: 'Cable Row', sets: 3, reps: '10-12', done: false },
     { name: 'Face Pulls', sets: 3, reps: '15', done: false },
     { name: 'Hammer Curls', sets: 3, reps: '12', done: false },
   ]},
-  { day: 'Wednesday', focus: 'Rest / Active Recovery', shortFocus: 'Rest Day', color: 'text-white/40', exercises: [] },
-  { day: 'Thursday', focus: 'Legs — Quads / Hamstrings / Glutes', shortFocus: 'Leg Day', color: 'text-yellow-400', exercises: [
+  { day: 'Wednesday', focus: 'Active Recovery', shortFocus: 'Rest', type: 'rest', exercises: [] },
+  { day: 'Thursday', focus: 'Quads · Hamstrings · Glutes', shortFocus: 'Legs', type: 'legs', exercises: [
     { name: 'Squat', sets: 4, reps: '6-8', done: false },
     { name: 'Romanian Deadlift', sets: 3, reps: '10', done: false },
     { name: 'Leg Press', sets: 3, reps: '12', done: false },
     { name: 'Leg Curl', sets: 3, reps: '12', done: false },
     { name: 'Calf Raises', sets: 4, reps: '20', done: false },
   ]},
-  { day: 'Friday', focus: 'Push + Core', shortFocus: 'Push + Core', color: 'text-orange-400', exercises: [
+  { day: 'Friday', focus: 'Chest · Shoulders · Core', shortFocus: 'Push + Core', type: 'push', exercises: [
     { name: 'Dips', sets: 4, reps: '8-10', done: false },
     { name: 'Cable Fly', sets: 3, reps: '12', done: false },
     { name: 'Arnold Press', sets: 3, reps: '10', done: false },
     { name: 'Plank', sets: 3, reps: '60s', done: false },
     { name: 'Ab Rollout', sets: 3, reps: '10', done: false },
   ]},
-  { day: 'Saturday', focus: 'Pull + Cardio', shortFocus: 'Back Day', color: 'text-purple-400', exercises: [
+  { day: 'Saturday', focus: 'Back + Cardio', shortFocus: 'Pull + Cardio', type: 'cardio', exercises: [
     { name: 'Deadlift', sets: 4, reps: '5', done: false },
     { name: 'Lat Pulldown', sets: 3, reps: '10', done: false },
     { name: '20 min Cardio', sets: 1, reps: '20 min', done: false },
   ]},
-  { day: 'Sunday', focus: 'Rest', shortFocus: 'Rest Day', color: 'text-white/40', exercises: [] },
+  { day: 'Sunday', focus: 'Rest & Recover', shortFocus: 'Rest', type: 'rest', exercises: [] },
 ]
 
-const DEFAULT_PRS: PR[] = [
-  { exercise: 'Bench Press', value: '', date: '' },
-  { exercise: 'Squat', value: '', date: '' },
-  { exercise: 'Deadlift', value: '', date: '' },
-  { exercise: 'Overhead Press', value: '', date: '' },
-  { exercise: 'Pull-Ups', value: '', date: '' },
-]
+const TYPE_COLOR: Record<string, string> = {
+  push: '#f87171', pull: '#60a5fa', legs: '#facc15',
+  rest: 'rgba(255,255,255,0.3)', cardio: '#a78bfa',
+}
 
-const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
-const TODAY = DAYS[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1]
-const TODAY_KEY = new Date().toISOString().split('T')[0]
-const DAILY_GOAL = 8 // glasses
+const NUTRITION: Record<string, { label: string; focus: string; tips: string[]; avoid: string[] }> = {
+  push:    { label: 'Training Day', focus: 'High protein, moderate carbs', tips: ['Eat 20-40g protein within 2hrs of training', 'Complex carbs before the session for energy', 'Hydrate well — aim for 3L today'], avoid: ['Processed sugar', 'Heavy fat before training'] },
+  pull:    { label: 'Training Day', focus: 'High protein, moderate carbs', tips: ['Back training taxes the CNS — fuel it', 'Post-workout shake or chicken + rice', 'Electrolytes matter on heavy pulling days'], avoid: ['Training fasted on pull day', 'Skipping post-workout nutrition'] },
+  legs:    { label: 'Heavy Training Day', focus: 'Highest carbs of the week', tips: ['Legs burn the most glycogen — load up on carbs', 'Eat your biggest meal 2-3hrs before squats', 'Post-leg nutrition is critical for recovery'], avoid: ['Low carb on leg day', 'Training legs on an empty stomach'] },
+  cardio:  { label: 'Cardio Day', focus: 'Lean protein + light carbs', tips: ['Lighter day — moderate calories', 'Focus on nutrient density today', 'Good day to eat a little leaner'], avoid: ['Heavy meals before cardio', 'Skipping protein'] },
+  rest:    { label: 'Rest Day', focus: 'Recovery nutrition', tips: ['Protein is still important on rest days', 'Slightly lower carbs than training days', 'Prioritize anti-inflammatory foods: salmon, berries, greens'], avoid: ['Junk food — your body is repairing right now', 'Overeating just because it\'s rest day'] },
+}
 
-const MODES = [
-  { id: 'workout'   as BodyMode, label: 'Workout',    icon: '🏋️' },
-  { id: 'health'    as BodyMode, label: 'Health',     icon: '💡' },
-  { id: 'hydration' as BodyMode, label: 'Hydration',  icon: '💧' },
-  { id: 'records'   as BodyMode, label: 'PRs',        icon: '🏆' },
-]
+const WEIGHT_ENTRIES_DEFAULT: { date: string; weight: number }[] = []
 
 export default function BodyTab({ mode: modeProp, onModeChange }: { mode?: string; onModeChange?: (m: string) => void }) {
-  const mode = (modeProp ?? 'workout') as BodyMode
+  const mode = (modeProp ?? 'today') as BodyMode
   const [week, setWeek] = useState(WORKOUT_WEEK)
-  const [selectedDay, setSelectedDay] = useState(TODAY)
-  const [hydration, setHydration] = useLocalStorage<Record<string,number>>('mbs_hydration', {})
-  const [prs, setPrs] = useLocalStorage<PR[]>('mbs_prs', DEFAULT_PRS)
-  const [editingPR, setEditingPR] = useState<string | null>(null)
-  const [prDraft, setPrDraft] = useState('')
+  const [selectedDay, setSelectedDay] = useState(TODAY_NAME)
+  const [weights, setWeights] = useLocalStorage<{ date: string; weight: number }[]>('mbs_weights', WEIGHT_ENTRIES_DEFAULT)
+  const [weightDraft, setWeightDraft] = useState('')
+  const [sessionFeel, setSessionFeel] = useLocalStorage<Record<string, number>>('mbs_session_feel', {})
 
-  const todayGlasses = hydration[TODAY_KEY] ?? 0
-  const addGlass = () => setHydration({ ...hydration, [TODAY_KEY]: Math.min(todayGlasses + 1, DAILY_GOAL + 4) })
-  const removeGlass = () => setHydration({ ...hydration, [TODAY_KEY]: Math.max(0, todayGlasses - 1) })
-
+  const todayWorkout = WORKOUT_WEEK.find(w => w.day === TODAY_NAME)!
   const selectedWorkout = week.find(w => w.day === selectedDay)!
-  const todayWorkout = week.find(w => w.day === TODAY)!
   const completedCount = selectedWorkout.exercises.filter(e => e.done).length
   const totalCount = selectedWorkout.exercises.length
+  const weekDone = week.filter(w => w.exercises.length > 0 && w.exercises.every(e => e.done)).length
+  const weekTotal = week.filter(w => w.exercises.length > 0).length
+  const isRestDay = todayWorkout.type === 'rest'
+  const nutrition = NUTRITION[todayWorkout.type]
 
   const toggleExercise = (name: string) => {
     setWeek(prev => prev.map(day => day.day === selectedDay
@@ -114,31 +102,101 @@ export default function BodyTab({ mode: modeProp, onModeChange }: { mode?: strin
       : day))
   }
 
-  const savePR = (exercise: string) => {
-    setPrs(prs.map(p => p.exercise === exercise
-      ? { ...p, value: prDraft, date: TODAY_KEY }
-      : p))
-    setEditingPR(null)
-    setPrDraft('')
+  const logWeight = () => {
+    const w = parseFloat(weightDraft)
+    if (isNaN(w) || w <= 0) return
+    setWeights([...weights.filter(e => e.date !== TODAY_KEY), { date: TODAY_KEY, weight: w }])
+    setWeightDraft('')
   }
+
+  const recentWeights = [...weights].sort((a, b) => a.date.localeCompare(b.date)).slice(-10)
+  const maxW = Math.max(...recentWeights.map(w => w.weight), 1)
+  const minW = Math.min(...recentWeights.map(w => w.weight), 0)
+  const range = maxW - minW || 1
 
   return (
     <div className="flex flex-col">
       <TabPageHeader tab="body" subTab={mode} onSubTabChange={onModeChange} />
 
-      {/* ── WORKOUT ── */}
-      {mode === 'workout' && (
+      {/* ── TODAY ── */}
+      {mode === 'today' && (
         <div className="px-4 py-4 space-y-4">
-          {/* Today callout */}
-          <div className="bg-gradient-to-r from-body/20 to-body/5 border border-body/30 rounded-2xl p-4 flex items-center gap-4">
-            <div className="text-3xl">📅</div>
-            <div>
-              <p className="text-xs text-white/40 uppercase tracking-widest font-medium">Today</p>
-              <p className={`text-lg font-bold mt-0.5 ${todayWorkout.color}`}>{todayWorkout.shortFocus}</p>
-              <p className="text-xs text-white/50 mt-0.5">{todayWorkout.focus}</p>
+
+          {/* Hero: today's status */}
+          <div className="rounded-2xl overflow-hidden border"
+            style={{ background: `${TYPE_COLOR[todayWorkout.type]}10`, borderColor: `${TYPE_COLOR[todayWorkout.type]}30` }}>
+            <div className="px-5 py-5">
+              <p className="text-[10px] uppercase tracking-widest font-semibold text-white/40 mb-1">Today · {TODAY_NAME}</p>
+              <p className="text-2xl font-black text-white">{todayWorkout.shortFocus}</p>
+              <p className="text-sm mt-1" style={{ color: TYPE_COLOR[todayWorkout.type] }}>{todayWorkout.focus}</p>
+            </div>
+            {/* Week progress bar */}
+            <div className="px-5 pb-5">
+              <div className="flex justify-between text-[10px] text-white/30 mb-1.5">
+                <span>Week progress</span>
+                <span>{weekDone}/{weekTotal} sessions</span>
+              </div>
+              <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                <div className="h-full rounded-full transition-all duration-500"
+                  style={{ width: `${weekTotal ? (weekDone/weekTotal)*100 : 0}%`, background: TYPE_COLOR[todayWorkout.type], boxShadow: `0 0 8px ${TYPE_COLOR[todayWorkout.type]}` }} />
+              </div>
             </div>
           </div>
 
+          {/* Recovery card */}
+          <div className="bg-card border border-border rounded-2xl p-4">
+            <p className="text-[10px] text-white/30 uppercase tracking-widest font-semibold mb-3">Recovery Status</p>
+            <div className="flex gap-3">
+              {[
+                { label: 'Sleep', value: isRestDay ? '💤' : '😴', sub: 'Log tonight' },
+                { label: 'Soreness', value: isRestDay ? '✅' : '⚡', sub: isRestDay ? 'Rest day' : 'Check in' },
+                { label: 'Energy', value: '🔋', sub: 'How you feel' },
+              ].map(item => (
+                <div key={item.label} className="flex-1 text-center bg-white/3 rounded-xl py-3 border border-white/5">
+                  <div className="text-2xl mb-1">{item.value}</div>
+                  <p className="text-[10px] font-bold text-white/60">{item.label}</p>
+                  <p className="text-[9px] text-white/25 mt-0.5">{item.sub}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Nutrition snapshot */}
+          <div className="bg-card border border-border rounded-2xl p-4">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[10px] text-white/30 uppercase tracking-widest font-semibold">Nutrition Today</p>
+              <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold"
+                style={{ background: 'rgba(34,197,94,0.15)', color: '#22c55e' }}>{nutrition.label}</span>
+            </div>
+            <p className="text-sm font-bold text-white mb-3">{nutrition.focus}</p>
+            <div className="flex gap-2">
+              <button onClick={() => onModeChange?.('nutrition')}
+                className="flex-1 py-2 rounded-xl text-xs font-semibold text-white/50 border border-white/8 bg-white/3">
+                View full plan →
+              </button>
+              <button onClick={() => onModeChange?.('train')}
+                className="flex-1 py-2 rounded-xl text-xs font-semibold text-white"
+                style={{ background: '#22c55e22', border: '1px solid #22c55e44' }}>
+                {isRestDay ? 'View week →' : 'Start workout →'}
+              </button>
+            </div>
+          </div>
+
+          {/* Claw insight */}
+          <div className="rounded-2xl border border-white/5 bg-white/2 px-4 py-4">
+            <p className="text-[10px] text-white/20 uppercase tracking-widest font-semibold mb-2">From Claw</p>
+            <p className="text-sm text-white/55 leading-relaxed">
+              {isRestDay
+                ? "Rest days aren't optional — they're where you actually get stronger. Your muscles repair during recovery, not during the workout. Own the rest day."
+                : "Consistency beats intensity every time. Show up, do the work, go home. The person who trains at 70% for 5 years beats the person who trains at 100% for 6 months."}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* ── TRAIN ── */}
+      {mode === 'train' && (
+        <div className="px-4 py-4 space-y-4">
           {/* Day selector */}
           <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
             {DAYS.map(day => {
@@ -146,16 +204,24 @@ export default function BodyTab({ mode: modeProp, onModeChange }: { mode?: strin
               const isRest = w.exercises.length === 0
               const isDone = !isRest && w.exercises.every(e => e.done)
               const isActive = selectedDay === day
+              const isToday = day === TODAY_NAME
               return (
                 <button key={day} onClick={() => setSelectedDay(day)}
                   className="flex-shrink-0 flex flex-col items-center gap-1 px-3 py-2 rounded-xl border transition-all"
                   style={isActive
-                    ? { background: 'rgba(34,197,94,0.15)', borderColor: '#22c55e', color: '#22c55e' }
-                    : { background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.4)' }
+                    ? { background: `${TYPE_COLOR[w.type]}15`, borderColor: TYPE_COLOR[w.type] }
+                    : { background: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.07)' }
                   }>
-                  <span className="text-xs font-semibold">{day.slice(0,3)}</span>
-                  <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
-                    style={{ background: isDone ? '#22c55e' : 'rgba(255,255,255,0.07)', color: isDone ? '#fff' : 'rgba(255,255,255,0.3)' }}>
+                  <span className="text-[10px] font-bold uppercase" style={{ color: isActive ? TYPE_COLOR[w.type] : 'rgba(255,255,255,0.3)' }}>
+                    {day.slice(0,3)}
+                  </span>
+                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
+                    style={isDone
+                      ? { background: '#22c55e', color: '#fff' }
+                      : isToday
+                      ? { background: 'rgba(255,255,255,0.12)', color: '#fff' }
+                      : { background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.25)' }
+                    }>
                     {isDone ? '✓' : isRest ? '—' : day[0]}
                   </div>
                 </button>
@@ -163,167 +229,218 @@ export default function BodyTab({ mode: modeProp, onModeChange }: { mode?: strin
             })}
           </div>
 
-          {/* Progress */}
-          <div className="bg-card border border-border rounded-2xl p-4">
-            <p className="text-xs text-white/40 uppercase tracking-widest font-medium mb-1">{selectedDay}</p>
-            <h2 className="text-base font-bold text-white">{selectedWorkout.focus}</h2>
-            {totalCount > 0 && (
-              <div className="mt-3">
-                <div className="flex justify-between text-xs text-white/50 mb-1.5">
-                  <span>{completedCount}/{totalCount} exercises</span>
-                  <span>{Math.round((completedCount / totalCount) * 100)}%</span>
-                </div>
-                <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                  <div className="h-full bg-body rounded-full transition-all duration-500"
-                    style={{ width: `${(completedCount / totalCount) * 100}%` }} />
-                </div>
+          {/* Session header */}
+          <div className="rounded-2xl p-4 border"
+            style={{ background: `${TYPE_COLOR[selectedWorkout.type]}08`, borderColor: `${TYPE_COLOR[selectedWorkout.type]}25` }}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-white/40 uppercase tracking-widest font-medium">{selectedDay}</p>
+                <p className="text-lg font-black text-white mt-0.5">{selectedWorkout.shortFocus}</p>
+                <p className="text-xs mt-0.5" style={{ color: TYPE_COLOR[selectedWorkout.type] }}>{selectedWorkout.focus}</p>
               </div>
-            )}
+              {totalCount > 0 && (
+                <div className="relative w-14 h-14 flex-shrink-0">
+                  <svg width="56" height="56" viewBox="0 0 56 56" className="-rotate-90">
+                    <circle cx="28" cy="28" r="22" fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="5" />
+                    <circle cx="28" cy="28" r="22" fill="none" strokeWidth="5" strokeLinecap="round"
+                      stroke={TYPE_COLOR[selectedWorkout.type]}
+                      strokeDasharray={`${2 * Math.PI * 22}`}
+                      strokeDashoffset={`${2 * Math.PI * 22 * (1 - completedCount / totalCount)}`}
+                      style={{ transition: 'stroke-dashoffset 0.5s ease', filter: `drop-shadow(0 0 4px ${TYPE_COLOR[selectedWorkout.type]})` }} />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-xs font-black text-white">{completedCount}/{totalCount}</span>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
-          {selectedWorkout.exercises.length === 0
-            ? <div className="text-center py-12 text-white/30"><div className="text-4xl mb-3">😴</div><p>Rest day.</p></div>
-            : <div className="space-y-2">
-                {selectedWorkout.exercises.map(ex => (
-                  <button key={ex.name} onClick={() => toggleExercise(ex.name)}
-                    className="w-full flex items-center gap-4 p-4 rounded-2xl border transition-all text-left"
+          {/* Exercises */}
+          {selectedWorkout.exercises.length === 0 ? (
+            <div className="text-center py-16 text-white/25">
+              <p className="text-5xl mb-4">😴</p>
+              <p className="font-semibold">Rest day. Let your body recover.</p>
+              <p className="text-xs mt-2 text-white/15">Recovery is where growth actually happens.</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {selectedWorkout.exercises.map((ex, i) => (
+                <button key={ex.name} onClick={() => toggleExercise(ex.name)}
+                  className="w-full flex items-center gap-4 p-4 rounded-2xl border transition-all text-left"
+                  style={ex.done
+                    ? { background: `${TYPE_COLOR[selectedWorkout.type]}10`, borderColor: `${TYPE_COLOR[selectedWorkout.type]}35` }
+                    : { background: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.07)' }
+                  }>
+                  <div className="w-7 h-7 rounded-full border-2 flex-shrink-0 flex items-center justify-center font-bold text-xs transition-all"
                     style={ex.done
-                      ? { background: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.3)' }
-                      : { background: 'rgba(255,255,255,0.02)', borderColor: 'rgba(255,255,255,0.08)' }
+                      ? { background: TYPE_COLOR[selectedWorkout.type], borderColor: TYPE_COLOR[selectedWorkout.type], color: '#0a0a10' }
+                      : { borderColor: 'rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.2)' }
                     }>
-                    <div className="w-6 h-6 rounded-full border-2 flex-shrink-0 flex items-center justify-center"
-                      style={ex.done ? { background: '#22c55e', borderColor: '#22c55e' } : { borderColor: 'rgba(255,255,255,0.2)' }}>
-                      {ex.done && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17 4 12"/></svg>}
-                    </div>
-                    <p className={`flex-1 font-semibold text-sm ${ex.done ? 'text-white/40 line-through' : 'text-white'}`}>{ex.name}</p>
-                    <p className="text-sm font-bold text-white/60">{ex.sets} × {ex.reps}</p>
+                    {ex.done ? '✓' : i + 1}
+                  </div>
+                  <div className="flex-1">
+                    <p className={`font-semibold text-sm ${ex.done ? 'text-white/35 line-through' : 'text-white'}`}>{ex.name}</p>
+                  </div>
+                  <p className="text-sm font-bold text-white/50">{ex.sets} × {ex.reps}</p>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Session complete */}
+          {totalCount > 0 && completedCount === totalCount && !sessionFeel[TODAY_KEY] && (
+            <div className="rounded-2xl border p-5" style={{ background: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.3)' }}>
+              <p className="text-body font-bold text-center mb-3">🎉 Session complete! How'd it feel?</p>
+              <div className="flex gap-2">
+                {[{ v: 1, label: 'Tough 😤' }, { v: 2, label: 'Good 💪' }, { v: 3, label: 'Easy ⚡' }].map(f => (
+                  <button key={f.v} onClick={() => setSessionFeel({ ...sessionFeel, [TODAY_KEY]: f.v })}
+                    className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white/70 border border-white/10 bg-white/5 transition-all">
+                    {f.label}
                   </button>
                 ))}
               </div>
-          }
-          {totalCount > 0 && completedCount === totalCount && (
-            <div className="bg-body/10 border border-body/30 rounded-2xl p-4 text-center">
-              <p className="text-body font-bold">🎉 Workout complete. Let's go.</p>
+            </div>
+          )}
+          {totalCount > 0 && completedCount === totalCount && sessionFeel[TODAY_KEY] && (
+            <div className="rounded-2xl border p-4 text-center" style={{ background: 'rgba(34,197,94,0.08)', borderColor: 'rgba(34,197,94,0.2)' }}>
+              <p className="text-body font-semibold text-sm">Session logged. Rest up. 💪</p>
             </div>
           )}
         </div>
       )}
 
-      {/* ── HEALTH TIPS ── */}
-      {mode === 'health' && (
-        <div className="px-4 py-4 space-y-3">
-          <div className="bg-body/10 border border-body/30 rounded-2xl p-5">
-            <div className="flex items-start gap-3">
-              <span className="text-3xl">{TODAY_TIP.icon}</span>
-              <div>
-                <p className="text-[10px] text-body/70 uppercase tracking-widest font-semibold mb-1">Tip of the Day</p>
-                <p className="text-base font-bold text-white mb-2">{TODAY_TIP.title}</p>
-                <p className="text-sm text-white/65 leading-relaxed">{TODAY_TIP.body}</p>
-              </div>
-            </div>
-          </div>
-
-          <p className="text-[10px] text-white/30 uppercase tracking-widest font-semibold px-1 pt-2">More Tips</p>
-          {HEALTH_TIPS.filter(t => t.title !== TODAY_TIP.title).map(tip => (
-            <div key={tip.title} className="bg-card border border-border rounded-2xl p-4 flex gap-3">
-              <span className="text-2xl flex-shrink-0">{tip.icon}</span>
-              <div>
-                <p className="text-sm font-bold text-white mb-1">{tip.title}</p>
-                <p className="text-xs text-white/50 leading-relaxed">{tip.body}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* ── HYDRATION ── */}
-      {mode === 'hydration' && (
-        <div className="px-4 py-6 space-y-6">
-          {/* Big display */}
-          <div className="flex flex-col items-center gap-2">
-            <div className="relative">
-              <svg width="160" height="160" viewBox="0 0 160 160" className="-rotate-90">
-                <circle cx="80" cy="80" r="68" fill="none" stroke="rgba(34,197,94,0.1)" strokeWidth="10" />
-                <circle cx="80" cy="80" r="68" fill="none" stroke="#22c55e" strokeWidth="10" strokeLinecap="round"
-                  strokeDasharray={`${2 * Math.PI * 68}`}
-                  strokeDashoffset={`${2 * Math.PI * 68 * (1 - Math.min(todayGlasses / DAILY_GOAL, 1))}`}
-                  style={{ filter: 'drop-shadow(0 0 8px rgba(34,197,94,0.6))', transition: 'stroke-dashoffset 0.5s ease' }} />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-4xl font-black text-white">{todayGlasses}</span>
-                <span className="text-xs text-white/40">/ {DAILY_GOAL} glasses</span>
-              </div>
-            </div>
-            <p className="text-sm font-semibold text-white/60">
-              {todayGlasses === 0 ? "Start hydrating 💧" : todayGlasses < DAILY_GOAL ? `${DAILY_GOAL - todayGlasses} more to go` : "Hydration goal hit! 🎉"}
+      {/* ── NUTRITION ── */}
+      {mode === 'nutrition' && (
+        <div className="px-4 py-4 space-y-4">
+          <div className="rounded-2xl p-5 border"
+            style={{ background: 'rgba(34,197,94,0.06)', borderColor: 'rgba(34,197,94,0.2)' }}>
+            <p className="text-[10px] text-body/70 uppercase tracking-widest font-semibold mb-1">
+              {TODAY_NAME} · {nutrition.label}
             </p>
+            <p className="text-xl font-black text-white">{nutrition.focus}</p>
           </div>
 
-          {/* Controls */}
-          <div className="flex gap-3">
-            <button onClick={removeGlass}
-              className="flex-1 py-4 rounded-2xl border border-white/10 text-white/50 text-xl font-bold transition-all active:scale-[0.97]"
-              style={{ background: 'rgba(255,255,255,0.03)' }}>−</button>
-            <button onClick={addGlass}
-              className="flex-1 py-4 rounded-2xl text-white text-xl font-bold transition-all active:scale-[0.97]"
-              style={{ background: 'linear-gradient(135deg, #22c55e, #16a34a)', boxShadow: '0 0 20px rgba(34,197,94,0.3)' }}>
-              + Glass
-            </button>
-          </div>
-
-          {/* Grid of glasses */}
           <div className="bg-card border border-border rounded-2xl p-4">
-            <p className="text-[10px] text-white/30 uppercase tracking-widest font-semibold mb-3">Today's Progress</p>
-            <div className="grid grid-cols-8 gap-2">
-              {Array.from({ length: DAILY_GOAL }).map((_, i) => (
-                <div key={i} className="aspect-square rounded-lg flex items-center justify-center text-lg transition-all"
-                  style={{ background: i < todayGlasses ? 'rgba(34,197,94,0.2)' : 'rgba(255,255,255,0.04)',
-                    filter: i < todayGlasses ? 'drop-shadow(0 0 4px rgba(34,197,94,0.4))' : 'none' }}>
-                  {i < todayGlasses ? '💧' : '○'}
+            <p className="text-[10px] text-white/30 uppercase tracking-widest font-semibold mb-3">Do This Today</p>
+            <div className="space-y-3">
+              {nutrition.tips.map((tip, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                    style={{ background: 'rgba(34,197,94,0.2)' }}>
+                    <span className="text-body text-[10px] font-black">{i + 1}</span>
+                  </div>
+                  <p className="text-sm text-white/75 leading-relaxed">{tip}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          <p className="text-center text-xs text-white/20">Tip: ~8 glasses (64 oz) is a solid daily baseline.</p>
+          <div className="bg-card border border-border rounded-2xl p-4">
+            <p className="text-[10px] text-white/30 uppercase tracking-widest font-semibold mb-3">Minimize Today</p>
+            <div className="space-y-2">
+              {nutrition.avoid.map((item, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <span className="text-red-400 text-sm">✕</span>
+                  <p className="text-sm text-white/55">{item}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-card border border-border rounded-2xl p-4">
+            <p className="text-[10px] text-white/30 uppercase tracking-widest font-semibold mb-2">The Principle</p>
+            <p className="text-sm text-white/55 leading-relaxed">
+              This app doesn't count calories. It gives you the right framework for the right day. Eat real food, prioritize protein, and adjust carbs based on training intensity. That's 90% of it.
+            </p>
+          </div>
         </div>
       )}
 
-      {/* ── PERSONAL RECORDS ── */}
-      {mode === 'records' && (
-        <div className="px-4 py-4 space-y-3">
-          <div className="bg-card border border-border rounded-2xl p-4 mb-2">
-            <p className="text-sm text-white/50 leading-relaxed">Track your personal bests. Tap a lift to update your PR.</p>
+      {/* ── PROGRESS ── */}
+      {mode === 'progress' && (
+        <div className="px-4 py-4 space-y-4">
+          {/* Log weight */}
+          <div className="bg-card border border-border rounded-2xl p-4">
+            <p className="text-[10px] text-white/30 uppercase tracking-widest font-semibold mb-3">Log Today's Weight</p>
+            <div className="flex gap-3">
+              <input value={weightDraft} onChange={e => setWeightDraft(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && logWeight()}
+                type="number" placeholder="e.g. 185"
+                className="flex-1 bg-white/5 border border-border rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-body" />
+              <span className="flex items-center text-sm text-white/40 pr-1">lbs</span>
+              <button onClick={logWeight} disabled={!weightDraft}
+                className="px-5 py-3 rounded-xl text-sm font-bold text-white disabled:opacity-30"
+                style={{ background: '#22c55e', boxShadow: '0 0 15px rgba(34,197,94,0.3)' }}>
+                Log
+              </button>
+            </div>
           </div>
-          {prs.map(pr => (
-            <div key={pr.exercise} className="bg-card border border-border rounded-2xl overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-4">
-                <div>
-                  <p className="text-sm font-bold text-white">{pr.exercise}</p>
-                  {pr.date && <p className="text-[10px] text-white/30 mt-0.5">{pr.date}</p>}
-                </div>
-                {editingPR === pr.exercise ? (
-                  <div className="flex items-center gap-2">
-                    <input autoFocus value={prDraft} onChange={e => setPrDraft(e.target.value)}
-                      onKeyDown={e => e.key === 'Enter' && savePR(pr.exercise)}
-                      placeholder="e.g. 225 lbs"
-                      className="w-28 bg-white/10 border border-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none text-right" />
-                    <button onClick={() => savePR(pr.exercise)}
-                      className="px-3 py-2 bg-body rounded-xl text-white text-xs font-bold">✓</button>
-                  </div>
-                ) : (
-                  <button onClick={() => { setEditingPR(pr.exercise); setPrDraft(pr.value) }}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl transition-all"
-                    style={{ background: pr.value ? 'rgba(245,158,11,0.15)' : 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                    {pr.value
-                      ? <><span className="text-amber-400 font-black text-lg">{pr.value}</span><Trophy size={14} className="text-amber-400" /></>
-                      : <span className="text-white/30 text-sm">Set PR</span>
-                    }
-                  </button>
-                )}
+
+          {/* Weight chart */}
+          {recentWeights.length > 1 ? (
+            <div className="bg-card border border-border rounded-2xl p-4">
+              <p className="text-[10px] text-white/30 uppercase tracking-widest font-semibold mb-4">Weight Trend</p>
+              <div className="relative" style={{ height: 120 }}>
+                <svg width="100%" height="120" viewBox={`0 0 300 120`} preserveAspectRatio="none">
+                  {/* Grid lines */}
+                  {[0, 0.5, 1].map(t => (
+                    <line key={t} x1="0" y1={t * 100} x2="300" y2={t * 100} stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+                  ))}
+                  {/* Area fill */}
+                  <path
+                    d={`M ${recentWeights.map((w, i) => `${(i / (recentWeights.length - 1)) * 300},${100 - ((w.weight - minW) / range) * 90}`).join(' L ')} L 300,110 L 0,110 Z`}
+                    fill="url(#bodyGrad)" opacity="0.3" />
+                  {/* Line */}
+                  <path
+                    d={`M ${recentWeights.map((w, i) => `${(i / (recentWeights.length - 1)) * 300},${100 - ((w.weight - minW) / range) * 90}`).join(' L ')}`}
+                    fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                    style={{ filter: 'drop-shadow(0 0 4px rgba(34,197,94,0.6))' }} />
+                  {/* Dots */}
+                  {recentWeights.map((w, i) => (
+                    <circle key={i}
+                      cx={(i / (recentWeights.length - 1)) * 300}
+                      cy={100 - ((w.weight - minW) / range) * 90}
+                      r="3.5" fill="#22c55e" stroke="#0a0a10" strokeWidth="2"
+                      style={{ filter: 'drop-shadow(0 0 3px rgba(34,197,94,0.8))' }} />
+                  ))}
+                  <defs>
+                    <linearGradient id="bodyGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#22c55e" />
+                      <stop offset="100%" stopColor="transparent" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+                {/* Min/max labels */}
+                <div className="absolute top-0 right-0 text-[10px] text-white/30">{maxW} lbs</div>
+                <div className="absolute bottom-5 right-0 text-[10px] text-white/30">{minW} lbs</div>
+              </div>
+              <div className="flex justify-between mt-2">
+                <span className="text-[9px] text-white/20">{recentWeights[0]?.date}</span>
+                <span className="text-[9px] text-white/20">{recentWeights[recentWeights.length - 1]?.date}</span>
               </div>
             </div>
-          ))}
+          ) : (
+            <div className="bg-card border border-border rounded-2xl p-8 text-center">
+              <p className="text-3xl mb-3">📈</p>
+              <p className="text-sm text-white/40">Log weight for a few days to see your trend.</p>
+            </div>
+          )}
+
+          {/* History list */}
+          {weights.length > 0 && (
+            <div className="bg-card border border-border rounded-2xl overflow-hidden">
+              <div className="px-4 py-3 border-b border-border">
+                <p className="text-[10px] text-white/30 uppercase tracking-widest font-semibold">Log History</p>
+              </div>
+              {[...weights].reverse().slice(0, 7).map((e, i, arr) => (
+                <div key={e.date} className={`flex items-center justify-between px-4 py-3 ${i < arr.length - 1 ? 'border-b border-border' : ''}`}>
+                  <span className="text-xs text-white/40">{e.date}</span>
+                  <span className="text-sm font-bold text-white">{e.weight} lbs</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

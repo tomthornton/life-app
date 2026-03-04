@@ -10,10 +10,10 @@ export const SUB_TABS: Record<Tab, { id: string; label: string; icon: string }[]
     { id: 'mood',    label: 'Mood',    icon: '🌡️' },
   ],
   body:    [
-    { id: 'workout',   label: 'Workout',   icon: '🏋️' },
-    { id: 'health',    label: 'Health',    icon: '💡' },
-    { id: 'hydration', label: 'Hydration', icon: '💧' },
-    { id: 'records',   label: 'PRs',       icon: '🏆' },
+    { id: 'today',     label: 'Today',     icon: '📋' },
+    { id: 'train',     label: 'Train',     icon: '🏋️' },
+    { id: 'nutrition', label: 'Nutrition', icon: '🥗' },
+    { id: 'progress',  label: 'Progress',  icon: '📈' },
   ],
   spirit:  [
     { id: 'daily',     label: 'Daily',     icon: '📖' },
