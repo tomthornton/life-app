@@ -22,7 +22,7 @@ export default function AppHeader({
   const color = TAB_COLORS[activeTab]
 
   return (
-    <div className="safe-top relative overflow-hidden bg-[#0a0a10]">
+    <div className="safe-top relative overflow-hidden" style={{ background: 'var(--color-bg)' }}>
       {/* Ambient glow */}
       <div className="absolute -top-10 -left-10 w-56 h-56 rounded-full blur-3xl opacity-[0.18] transition-all duration-700 pointer-events-none"
         style={{ background: color }} />

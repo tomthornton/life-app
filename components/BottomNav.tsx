@@ -88,7 +88,7 @@ export default function BottomNav({
   setActiveTab: (tab: Tab) => void
 }) {
   return (
-    <nav className="safe-bottom bg-[#0d0d16] border-t border-white/5">
+    <nav className="safe-bottom border-t border-white/5" style={{ background: 'var(--color-surface)' }}>
       <div className="flex items-center justify-around px-2 py-2">
         {tabs.map(({ id, label, renderIcon, activeColor, glowColor }) => {
           const isActive = activeTab === id

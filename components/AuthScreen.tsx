@@ -39,7 +39,7 @@ export default function AuthScreen({ onAuth }: { onAuth: (user: User) => void })
   }
 
   return (
-    <div className="fixed inset-0 flex flex-col overflow-hidden" style={{ background: '#07070e' }}>
+    <div className="fixed inset-0 flex flex-col overflow-hidden" style={{ background: 'var(--color-bg)' }}>
 
       {/* Background — layered color blobs */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">

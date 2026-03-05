@@ -9,6 +9,7 @@ import ProfileTab from '@/components/tabs/ProfileTab'
 import BottomNav from '@/components/BottomNav'
 import AppHeader from '@/components/AppHeader'
 import AuthScreen from '@/components/AuthScreen'
+import ThemeProvider from '@/components/ThemeProvider'
 import { Tab, SUB_TABS } from '@/lib/tabs'
 
 type User = { name: string; email: string }
@@ -33,10 +34,11 @@ export default function Home() {
   }
 
   if (!ready) return null
-  if (!user) return <AuthScreen onAuth={(u) => setUser(u)} />
+  if (!user) return <ThemeProvider><AuthScreen onAuth={(u) => setUser(u)} /></ThemeProvider>
 
   return (
-    <main className="fixed inset-0 flex flex-col bg-[#0a0a10] overflow-hidden">
+    <ThemeProvider>
+    <main className="fixed inset-0 flex flex-col overflow-hidden" style={{ background: 'var(--color-bg)' }}>
       <AppHeader
         activeTab={activeTab}
         onProfilePress={() => handleTabChange('profile')}
@@ -66,5 +68,6 @@ export default function Home() {
 
       <BottomNav activeTab={activeTab} setActiveTab={handleTabChange} />
     </main>
+    </ThemeProvider>
   )
 }
